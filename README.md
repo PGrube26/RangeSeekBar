@@ -1,5 +1,5 @@
 # RangeSeekBar
-RangeSeekBar is an Android Library to show a distinct slider let the user set ranges.
+RangeSeekBar is an Android Library to show a discrete slider let the user set ranges.
 
 # Usage
 Add a RangeSeekBar to your xml files and set color, which thumb to draw,...
