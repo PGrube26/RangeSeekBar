@@ -1,6 +1,26 @@
 # RangeSeekBar
 RangeSeekBar is an Android Library to show a discrete slider let the user set ranges.
 
+# Download
+1. Add it in your root `build.gradle` at the end of repositories:
+
+    ```javascript
+    allprojects {
+    	repositories {
+    		...
+    		maven { url "https://jitpack.io" }
+    	}
+    }
+    ```
+
+2. Add the dependency
+
+    ```javascript
+    dependencies {
+        compile 'com.github.PGrube26:RangeSeekBar:1.0.0'
+    }
+    ```
+    
 # Usage
 Add a RangeSeekBar to your xml files and set color, which thumb to draw,...
 ```xml
