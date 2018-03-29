@@ -8,7 +8,7 @@ import android.util.TypedValue
 import android.view.View
 
 /**
- * Thumbs is a subclass of [View] and handles the thumb drawing with (shadow) pins. Thumbs are only small circles which the user can drag around to set a value in the range seek bar.
+ * Thumbs is a subclass of View and handles the thumb drawing with (shadow) pins. Thumbs are only small circles which the user can drag around to set a value in the range seek bar.
  *
  * @author peterg
  */

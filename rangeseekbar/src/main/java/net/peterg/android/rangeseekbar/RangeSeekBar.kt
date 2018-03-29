@@ -15,8 +15,8 @@ import android.view.View
 import android.view.ViewTreeObserver
 
 /**
- * Range seek bar to let the user select a range from a given data list. You can use this view inside your xml layout or create one from code. The data list can contain any data object which implements the [Parcelable] interface. The [toString]
- * method is used to show the current value inside of a pin. If you have to get notified about the updated values just set your own method for the [RangeSeekBar.callbackAction]. There you get the range bar which values where updated, the new
+ * Range seek bar implementation of a discrete slider to let the user select a range from a given data list. You can use this view inside your xml layout or create one from code. The data list can contain any data object which implements the parcelable interface. The toString
+ * method is used to show the current value inside of a pin. If you have to get notified about the updated values just set your own method for the callbackAction. There you get the range bar which values where updated, the new
  * values and if the action was user intended.
  *
  * @author peterg
