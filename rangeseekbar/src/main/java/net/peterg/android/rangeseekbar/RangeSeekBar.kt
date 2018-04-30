@@ -68,6 +68,8 @@ private inline fun <T : View> T.onLayoutDone(crossinline f: T.() -> Unit) {
 
 class RangeSeekBar @JvmOverloads constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0) : AppCompatImageView(context, attrs, defStyleAttr) {
 
+    var thumbToDraw = LEFT_THUMB
+
     private lateinit var leftThumb: Thumb
     private lateinit var rightThumb: Thumb
     private lateinit var backGroundBar: Bar
@@ -80,7 +82,6 @@ class RangeSeekBar @JvmOverloads constructor(context: Context, attrs: AttributeS
 
     private var showPin = false
 
-    private var thumbToDraw = LEFT_THUMB
     private var drawPinShadow = false
 
     private var leftIndex = 0
@@ -227,6 +228,7 @@ class RangeSeekBar @JvmOverloads constructor(context: Context, attrs: AttributeS
             thumbToDraw = bundle.getInt(THUMB_TO_DRAW)
         }
 
+        if (dataList.isEmpty()) return
         setThumbs(leftIndex, rightIndex)
         if (this::backGroundBar.isInitialized) {
             backGroundBar.setSegmentDistanceWithSegmentCount(this.dataList.size - 1)
@@ -272,20 +274,20 @@ class RangeSeekBar @JvmOverloads constructor(context: Context, attrs: AttributeS
     }
 
     /**
-     * Sets the data the user can choose from. The thumbs will be set to the default positions.
+     * Sets the data the user can choose from. The thumbs will be set to the default positions. If the data list is empty nothing happens.
      */
     fun setData(dataList: List<Parcelable>) {
+        if (dataList.isEmpty() || dataList == this.dataList) return
         this.dataList = dataList
+        rightIndex = this.dataList.size - 1
         if (this::backGroundBar.isInitialized) {
             backGroundBar.setSegmentDistanceWithSegmentCount(this.dataList.size - 1)
-            rightIndex = this.dataList.size - 1
             createThumbs()
 
             invalidate()
         } else {
             onLayoutDone {
                 backGroundBar.setSegmentDistanceWithSegmentCount(this.dataList.size - 1)
-                rightIndex = this.dataList.size - 1
                 createThumbs()
 
                 invalidate()
@@ -326,13 +328,23 @@ class RangeSeekBar @JvmOverloads constructor(context: Context, attrs: AttributeS
      * @throws IllegalArgumentException if the datalist doesn't contains the given values
      */
     @Suppress("unused")
-    fun setThumbs(leftThumbValue: Parcelable, rightThumbValue: Parcelable) {
-        if (!dataList.contains(leftThumbValue) || !dataList.contains(rightThumbValue)) throw IllegalArgumentException("Values not in provided data list")
+    fun setThumbs(leftThumbValue: Parcelable?, rightThumbValue: Parcelable?) {
+        val newLeftIndex = if (leftThumbValue != null) {
+            dataList.getLeftIndexFromValue(leftThumbValue)
+        } else {
+            0
+        }
 
-        val newLeftIndex = dataList.getLeftIndexFromValue(leftThumbValue)
-        val newRightIndex = dataList.getRightIndexFromValue(rightThumbValue)
+        val newRightIndex = if (rightThumbValue != null) {
+            dataList.getRightIndexFromValue(rightThumbValue)
+        } else {
+            dataList.size - 1
+        }
 
         setThumbs(newLeftIndex, newRightIndex)
+        if (this::backGroundBar.isInitialized) {
+            createThumbs()
+        }
     }
 
     private fun setThumbs(newLeftIndex: Int, newRightIndex: Int) {

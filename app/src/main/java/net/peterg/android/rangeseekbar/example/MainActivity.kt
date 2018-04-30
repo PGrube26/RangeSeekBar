@@ -15,7 +15,9 @@ class MainActivity : AppCompatActivity() {
 
         Timber.plant(Timber.DebugTree())
 
-        rangeSeekBar1.setData(listOf(SimpleDataClass("Min", -1), SimpleDataClass("2", 2), SimpleDataClass("3", 3), SimpleDataClass("Max", -1)))
+        if (savedInstanceState == null) {
+            rangeSeekBar1.setData(listOf(SimpleDataClass("Min", -1), SimpleDataClass("2", 2), SimpleDataClass("3", 3), SimpleDataClass("Max", -1)))
+        }
 
         setDataList.setOnClickListener {
             rangeSeekBar2.setData(listOf(SimpleDataClass("0", 0), SimpleDataClass("1", 1), SimpleDataClass("2", 2), SimpleDataClass("3", 3),
