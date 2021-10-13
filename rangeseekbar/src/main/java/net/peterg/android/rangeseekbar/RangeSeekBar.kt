@@ -7,12 +7,13 @@ import android.graphics.Canvas
 import android.graphics.Color
 import android.os.Bundle
 import android.os.Parcelable
-import android.support.v7.widget.AppCompatImageView
 import android.util.AttributeSet
 import android.util.TypedValue
 import android.view.MotionEvent
 import android.view.View
 import android.view.ViewTreeObserver
+import androidx.appcompat.widget.AppCompatImageView
+import kotlin.math.min
 
 /**
  * Range seek bar implementation of a discrete slider to let the user select a range from a given data list. You can use this view inside your xml layout or create one from code. The data list can contain any data object which implements the parcelable interface. The toString
@@ -68,7 +69,7 @@ private inline fun <T : View> T.onLayoutDone(crossinline f: T.() -> Unit) {
 
 class RangeSeekBar @JvmOverloads constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0) : AppCompatImageView(context, attrs, defStyleAttr) {
 
-    var thumbToDraw = LEFT_THUMB
+    private var thumbToDraw = LEFT_THUMB
 
     private lateinit var leftThumb: Thumb
     private lateinit var rightThumb: Thumb
@@ -87,15 +88,21 @@ class RangeSeekBar @JvmOverloads constructor(context: Context, attrs: AttributeS
     private var leftIndex = 0
     private var rightIndex = 1
 
-    private val differencePadding = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
-            DEFAULT_DIFFERENCE_PADDING,
-            resources.displayMetrics)
-    private val expandedPinRadius = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
-            DEFAULT_THUMB_RADIUS_DP * THUMB_PRESSED_RADIUS_SCALE_OUTER,
-            resources.displayMetrics)
-    private val pinPadding = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
-            DEFAULT_FINAL_PIN_PADDING,
-            resources.displayMetrics)
+    private val differencePadding = TypedValue.applyDimension(
+        TypedValue.COMPLEX_UNIT_DIP,
+        DEFAULT_DIFFERENCE_PADDING,
+        resources.displayMetrics
+    )
+    private val expandedPinRadius = TypedValue.applyDimension(
+        TypedValue.COMPLEX_UNIT_DIP,
+        DEFAULT_THUMB_RADIUS_DP * THUMB_PRESSED_RADIUS_SCALE_OUTER,
+        resources.displayMetrics
+    )
+    private val pinPadding = TypedValue.applyDimension(
+        TypedValue.COMPLEX_UNIT_DIP,
+        DEFAULT_FINAL_PIN_PADDING,
+        resources.displayMetrics
+    )
 
     private val minViewHeight: Int
 
@@ -123,34 +130,40 @@ class RangeSeekBar @JvmOverloads constructor(context: Context, attrs: AttributeS
         }
 
         minViewHeight = if (showPin) {
-            val screenHeightAdaption = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
-                    DEFAULT_SCREEN_HEIGHT_ADAPTION.toFloat(),
-                    resources.displayMetrics).toInt()
-            val viewHeightShowPin = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
-                    DEFAULT_THUMB_RADIUS_DP,
-                    resources.displayMetrics).toInt()
+            val screenHeightAdaption = TypedValue.applyDimension(
+                TypedValue.COMPLEX_UNIT_DIP,
+                DEFAULT_SCREEN_HEIGHT_ADAPTION.toFloat(),
+                resources.displayMetrics
+            ).toInt()
+            val viewHeightShowPin = TypedValue.applyDimension(
+                TypedValue.COMPLEX_UNIT_DIP,
+                DEFAULT_THUMB_RADIUS_DP,
+                resources.displayMetrics
+            ).toInt()
             viewHeightShowPin + (2 * expandedPinRadius + pinPadding + differencePadding).toInt() + screenHeightAdaption
         } else {
-            TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
-                    DEFAULT_THUMB_RADIUS_DP * THUMB_PRESSED_RADIUS_SCALE_OUTER,
-                    resources.displayMetrics).toInt() * 2
+            TypedValue.applyDimension(
+                TypedValue.COMPLEX_UNIT_DIP,
+                DEFAULT_THUMB_RADIUS_DP * THUMB_PRESSED_RADIUS_SCALE_OUTER,
+                resources.displayMetrics
+            ).toInt() * 2
         }
     }
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
-        val measureWidth = View.MeasureSpec.getSize(widthMeasureSpec)
-        val width = when (View.MeasureSpec.getMode(widthMeasureSpec)) {
-            View.MeasureSpec.AT_MOST -> measureWidth + paddingLeft + paddingRight
-            View.MeasureSpec.EXACTLY -> measureWidth
-            View.MeasureSpec.UNSPECIFIED -> DEFAULT_WIDTH
+        val measureWidth = MeasureSpec.getSize(widthMeasureSpec)
+        val width = when (MeasureSpec.getMode(widthMeasureSpec)) {
+            MeasureSpec.AT_MOST -> measureWidth + paddingLeft + paddingRight
+            MeasureSpec.EXACTLY -> measureWidth
+            MeasureSpec.UNSPECIFIED -> DEFAULT_WIDTH
             else -> DEFAULT_WIDTH
         }
 
-        val measureHeight = View.MeasureSpec.getSize(heightMeasureSpec)
-        val height = when (View.MeasureSpec.getMode(heightMeasureSpec)) {
-            View.MeasureSpec.AT_MOST -> Math.min(minViewHeight, measureHeight)
-            View.MeasureSpec.EXACTLY -> measureHeight
-            View.MeasureSpec.UNSPECIFIED -> minViewHeight
+        val measureHeight = MeasureSpec.getSize(heightMeasureSpec)
+        val height = when (MeasureSpec.getMode(heightMeasureSpec)) {
+            MeasureSpec.AT_MOST -> min(minViewHeight, measureHeight)
+            MeasureSpec.EXACTLY -> measureHeight
+            MeasureSpec.UNSPECIFIED -> minViewHeight
             else -> minViewHeight
         }
         setMeasuredDimension(width, height)
@@ -160,19 +173,23 @@ class RangeSeekBar @JvmOverloads constructor(context: Context, attrs: AttributeS
         super.onSizeChanged(w, h, oldw, oldh)
 
         val yCoordinate = if (showPin) {
-            h - TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
-                    thumbRadiusDP + 2,
-                    resources.displayMetrics)
+            h - TypedValue.applyDimension(
+                TypedValue.COMPLEX_UNIT_DIP,
+                thumbRadiusDP + 2,
+                resources.displayMetrics
+            )
         } else {
             h / 2f
         }
 
-        backGroundBar = Bar(context = context,
-                yCoordinate = yCoordinate,
-                leftXCoordinate = getThumbRadiusPx(thumbRadiusDP),
-                rightXCoordinate = w - getThumbRadiusPx(thumbRadiusDP),
-                height = DEFAULT_BACKGROUND_BAR_HEIGHT_DP,
-                color = DEFAULT_BACKGROUND_BAR_COLOR)
+        backGroundBar = Bar(
+            context = context,
+            yCoordinate = yCoordinate,
+            leftXCoordinate = getThumbRadiusPx(thumbRadiusDP),
+            rightXCoordinate = w - getThumbRadiusPx(thumbRadiusDP),
+            height = DEFAULT_BACKGROUND_BAR_HEIGHT_DP,
+            color = DEFAULT_BACKGROUND_BAR_COLOR
+        )
     }
 
     override fun onDraw(canvas: Canvas) {
@@ -218,7 +235,7 @@ class RangeSeekBar @JvmOverloads constructor(context: Context, attrs: AttributeS
 
             leftIndex = bundle.getInt(LEFT_SEGMENT_INDEX)
             rightIndex = bundle.getInt(RIGHT_SEGMENT_INDEX)
-            dataList = bundle.getParcelableArrayList(DATA_LIST)
+            dataList = bundle.getParcelableArrayList(DATA_LIST) ?: emptyList()
 
             thumbSeekBarColor = bundle.getInt(COLOR)
             thumbRadiusDP = bundle.getFloat(THUMB_RADIUS_DP)
@@ -303,13 +320,15 @@ class RangeSeekBar @JvmOverloads constructor(context: Context, attrs: AttributeS
         leftIndex = 0
         rightIndex = dataList.size - 1
 
-        backGroundBar = Bar(context = context,
-                yCoordinate = backGroundBar.yCoordinate,
-                leftXCoordinate = leftThumb.thumbPressedShadeRadiusPx,
-                rightXCoordinate = width - rightThumb.thumbPressedShadeRadiusPx,
-                height = DEFAULT_BACKGROUND_BAR_HEIGHT_DP,
-                color = DEFAULT_BACKGROUND_BAR_COLOR,
-                segmentCount = dataList.size - 1)
+        backGroundBar = Bar(
+            context = context,
+            yCoordinate = backGroundBar.yCoordinate,
+            leftXCoordinate = leftThumb.thumbPressedShadeRadiusPx,
+            rightXCoordinate = width - rightThumb.thumbPressedShadeRadiusPx,
+            height = DEFAULT_BACKGROUND_BAR_HEIGHT_DP,
+            color = DEFAULT_BACKGROUND_BAR_COLOR,
+            segmentCount = dataList.size - 1
+        )
 
         leftThumb.xCoordinate = backGroundBar.getXCoordinate(leftIndex)
         rightThumb.xCoordinate = backGroundBar.getXCoordinate(rightIndex)
@@ -366,12 +385,14 @@ class RangeSeekBar @JvmOverloads constructor(context: Context, attrs: AttributeS
         leftThumb.pinText = dataList[leftIndex].toString()
         rightThumb.pinText = dataList[rightIndex].toString()
 
-        seekBar = Bar(context = context,
-                yCoordinate = backGroundBar.yCoordinate,
-                leftXCoordinate = backGroundBar.getXCoordinate(leftIndex),
-                rightXCoordinate = backGroundBar.getXCoordinate(rightIndex),
-                height = DEFAULT_BACKGROUND_BAR_HEIGHT_DP + 3,
-                color = thumbSeekBarColor)
+        seekBar = Bar(
+            context = context,
+            yCoordinate = backGroundBar.yCoordinate,
+            leftXCoordinate = backGroundBar.getXCoordinate(leftIndex),
+            rightXCoordinate = backGroundBar.getXCoordinate(rightIndex),
+            height = DEFAULT_BACKGROUND_BAR_HEIGHT_DP + 3,
+            color = thumbSeekBarColor
+        )
 
         checkEnabled()
     }
@@ -438,11 +459,13 @@ class RangeSeekBar @JvmOverloads constructor(context: Context, attrs: AttributeS
         val animator = ValueAnimator.ofFloat(0f, expandedPinRadius)
         animator.addUpdateListener {
             val pinRadius = it.animatedValue as Float
-            thumb.setAnimationSize(press = true,
-                    size = pinRadius,
-                    padding = pinPadding * it.animatedFraction + differencePadding,
-                    radiusAnimationRatio = pinRadius / expandedPinRadius,
-                    animationFraction = it.animatedFraction)
+            thumb.setAnimationSize(
+                press = true,
+                size = pinRadius,
+                padding = pinPadding * it.animatedFraction + differencePadding,
+                radiusAnimationRatio = pinRadius / expandedPinRadius,
+                animationFraction = it.animatedFraction
+            )
             invalidate()
         }
         animator.start()
@@ -454,11 +477,13 @@ class RangeSeekBar @JvmOverloads constructor(context: Context, attrs: AttributeS
         val animator = ValueAnimator.ofFloat(expandedPinRadius, 0f)
         animator.addUpdateListener {
             val pinRadius = it.animatedValue as Float
-            thumb.setAnimationSize(press = false,
-                    size = pinRadius,
-                    padding = pinPadding - pinPadding * it.animatedFraction + differencePadding,
-                    radiusAnimationRatio = pinRadius / expandedPinRadius,
-                    animationFraction = it.animatedFraction)
+            thumb.setAnimationSize(
+                press = false,
+                size = pinRadius,
+                padding = pinPadding - pinPadding * it.animatedFraction + differencePadding,
+                radiusAnimationRatio = pinRadius / expandedPinRadius,
+                animationFraction = it.animatedFraction
+            )
             invalidate()
         }
         animator.start()
@@ -521,7 +546,9 @@ class RangeSeekBar @JvmOverloads constructor(context: Context, attrs: AttributeS
     }
 
     private fun getThumbRadiusPx(thumbRadiusDP: Float) =
-            TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
-                    thumbRadiusDP * THUMB_PRESSED_RADIUS_SCALE_OUTER,
-                    resources.displayMetrics)
+        TypedValue.applyDimension(
+            TypedValue.COMPLEX_UNIT_DIP,
+            thumbRadiusDP * THUMB_PRESSED_RADIUS_SCALE_OUTER,
+            resources.displayMetrics
+        )
 }

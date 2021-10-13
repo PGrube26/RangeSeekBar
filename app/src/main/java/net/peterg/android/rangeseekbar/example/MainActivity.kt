@@ -1,8 +1,8 @@
 package net.peterg.android.rangeseekbar.example
 
-import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.os.Parcelable
+import androidx.appcompat.app.AppCompatActivity
 import kotlinx.android.parcel.Parcelize
 import kotlinx.android.synthetic.main.activity_main.*
 import timber.log.Timber
