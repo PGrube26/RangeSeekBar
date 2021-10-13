@@ -1,6 +1,8 @@
 plugins {
     id("com.android.library")
     kotlin("android")
+    id("maven-publish")
+    id("org.jetbrains.dokka") version "1.5.30"
 }
 
 android {
@@ -29,26 +31,45 @@ dependencies {
     androidTestImplementation("com.android.support.test.espresso:espresso-core:3.0.2")
 }
 
-//// build a jar with source files
-//task sourcesJar(type: Jar) {
-//    from android.sourceSets.main.java.srcDirs
-//    classifier = 'sources'
-//}
-//
-//task javadoc(type: Javadoc) {
-//    failOnError  false
-//    source = android.sourceSets.main.java.sourceFiles
-//    classpath += project.files(android.getBootClasspath().join(File.pathSeparator))
-//    classpath += configurations.compile
-//}
-//
-//// build a jar with javadoc
-//task javadocJar(type: Jar, dependsOn: javadoc) {
-//    classifier = 'javadoc'
-//    from javadoc.destinationDir
-//}
-//
-//artifacts {
-//    archives sourcesJar
-//    archives javadocJar
-//}
+val dokkaOutputDir = "$buildDir/dokka"
+
+tasks.getByName<org.jetbrains.dokka.gradle.DokkaTask>("dokkaHtml") {
+    outputDirectory.set(file(dokkaOutputDir))
+}
+val deleteDokkaOutputDir by tasks.register<Delete>("deleteDokkaOutputDirectory") {
+    delete(dokkaOutputDir)
+}
+
+val javadocJar = tasks.register<Jar>("javadocJar") {
+    dependsOn(deleteDokkaOutputDir, tasks.dokkaHtml)
+    archiveClassifier.set("javadoc")
+    from(dokkaOutputDir)
+}
+
+afterEvaluate {
+    publishing {
+        publications {
+            create<MavenPublication>("release") {
+                from(components["release"])
+                groupId = "com.github.pgrube26"
+                artifactId = "range_seek_bar"
+                version = "1.2"
+
+                artifact(javadocJar)
+
+                pom {
+                    name.set("RangeSeekBar")
+                    description.set("A simple library to show a discrete slider to let the user set a range.")
+                    url.set("https://github.com/PGrube26/RangeSeekBar")
+                    developers {
+                        developer {
+                            id.set("pgrube26")
+                            name.set("Peter Grube")
+                            email.set("pgrube26@gmail.com")
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
