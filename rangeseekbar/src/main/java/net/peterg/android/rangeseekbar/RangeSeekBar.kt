@@ -69,7 +69,10 @@ private inline fun <T : View> T.onLayoutDone(crossinline f: T.() -> Unit) {
 
 class RangeSeekBar @JvmOverloads constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0) : AppCompatImageView(context, attrs, defStyleAttr) {
 
-    private var thumbToDraw = LEFT_THUMB
+    /**
+     * The thumb to be shown on the bar. Can be one of [LEFT_THUMB], [RIGHT_THUMB] or [BOTH].
+     */
+    var thumbToDraw = LEFT_THUMB
 
     private lateinit var leftThumb: Thumb
     private lateinit var rightThumb: Thumb

@@ -53,7 +53,7 @@ afterEvaluate {
                 from(components["release"])
                 groupId = "com.github.pgrube26"
                 artifactId = "range_seek_bar"
-                version = "1.2.1"
+                version = "1.2.2"
 
                 artifact(javadocJar)
 
