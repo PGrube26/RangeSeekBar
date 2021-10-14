@@ -17,7 +17,7 @@ RangeSeekBar is an Android Library to show a discrete slider let the user set ra
 
     ```javascript
     dependencies {
-        compile 'com.github.PGrube26:RangeSeekBar:1.2.0'
+        compile 'com.github.PGrube26:RangeSeekBar:1.2.1'
     }
     ```
     
